@@ -1,0 +1,38 @@
+name: CI & Test Suite
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Run Test Suite & Typecheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: alertbot/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd alertbot
+          npm ci
+
+      - name: Verify TypeScript Compilation
+        run: |
+          cd alertbot
+          npx tsc --noEmit
+
+      - name: Run 262 Unit Tests
+        run: |
+          cd alertbot
+          npm test
